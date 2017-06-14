@@ -5,5 +5,5 @@ permalink: /thanks/
 ---
 
 ## SUCCESS!
-Thanks for being interested in the project.  
+Thanks for subscribing.  
 Will keep you informed for all latest news in the future!
