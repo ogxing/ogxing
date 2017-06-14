@@ -1,3 +1,5 @@
 _site/
 .sass-cache/
 .jekyll-metadata
+_posts/source-link.md
+_posts/todo.md

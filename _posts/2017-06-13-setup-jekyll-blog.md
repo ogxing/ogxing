@@ -1,9 +1,9 @@
 ---
-layout: default
+layout: post
 title:  "Sample"
 date:   2016-02-12 17:50:00
 categories: main
-visible: 1
+comments: true
 ---
 
 # How to setup Jekyll blog
