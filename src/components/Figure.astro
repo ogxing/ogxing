@@ -1,0 +1,9 @@
+---
+/** Image with caption for use inside .mdx posts. `wide` breaks out of the text column. */
+interface Props { src: string; alt: string; caption?: string; wide?: boolean; width?: number; height?: number }
+const { src, alt, caption, wide = false, width, height } = Astro.props;
+---
+<figure class:list={['figure', { wide }]}>
+  <img src={src} alt={alt} loading="lazy" decoding="async" width={width} height={height} />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ogxing.com/sitemap-index.xml

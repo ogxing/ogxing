@@ -1,0 +1,25 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostGrid from '../../components/PostGrid.astro';
+import { TOPICS, type TopicKey } from '../../consts';
+import { getPosts, topicsWithPosts } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return topicsWithPosts(posts).map((topic) => ({
+    params: { topic },
+    props: { posts: posts.filter((p) => p.data.topic === topic) },
+  }));
+}
+const { topic } = Astro.params as { topic: TopicKey };
+const { posts } = Astro.props;
+const t = TOPICS[topic];
+---
+<Base title={t.label} description={t.description}>
+  <div class="container">
+    <header class="index-head">
+      <h1 class="index-title">{t.label}</h1>
+    </header>
+    <PostGrid posts={posts} />
+  </div>
+</Base>

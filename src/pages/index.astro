@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import PostGrid from '../components/PostGrid.astro';
+import { getPosts } from '../lib/posts';
+
+const posts = await getPosts();
+---
+<Base>
+  <div class="container">
+    <header class="index-head">
+      <h1 class="index-title">Research</h1>
+    </header>
+    <PostGrid posts={posts} />
+  </div>
+</Base>

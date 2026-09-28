@@ -1,0 +1,91 @@
+---
+import { render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Toc from '../../components/Toc.astro';
+import PostGrid from '../../components/PostGrid.astro';
+import { TOPICS } from '../../consts';
+import { formatDate, isoDate } from '../../lib/format';
+import { getPosts, postUrl, topicUrl } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({
+    params: { id: post.id },
+    props: {
+      post,
+      series: post.data.series
+        ? posts.filter((p) => p.data.series === post.data.series).sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf())
+        : [],
+      more: posts.filter((p) => p.id !== post.id).sort((a, b) => (a.data.topic === post.data.topic ? -1 : 0) - (b.data.topic === post.data.topic ? -1 : 0)).slice(0, 3),
+    },
+  }));
+}
+const { post, series, more } = Astro.props;
+const { Content, headings } = await render(post);
+const topic = TOPICS[post.data.topic];
+const hero = post.data.hero === 'cover' && !post.data.cover ? 'none' : post.data.hero;
+---
+<Base title={post.data.title} description={post.data.summary} type="article" publishedTime={post.data.pubDate} hero={hero !== 'none'}>
+  <article data-pagefind-body>
+    {hero !== 'none' ? (
+      <header class="hero">
+        <div class="hero-media">
+          {post.data.cover && <Image src={post.data.cover} alt="" widths={[768, 1440, 2160]} sizes="100vw" />}
+        </div>
+        <div class="hero-text">
+          <h1 class="article-title">{post.data.title}</h1>
+          <p class="hero-sub">{post.data.summary}</p>
+        </div>
+      </header>
+      <div class="container">
+        <div class="meta article-bar">
+          <time class="date" datetime={isoDate(post.data.pubDate)} data-pagefind-meta="date">{formatDate(post.data.pubDate)}</time>
+          <a class="topic" href={topicUrl(post.data.topic)} data-pagefind-meta="topic">{topic.label}</a>
+        </div>
+      </div>
+    ) : (
+      <div class="container">
+        <header class="article-head">
+          <div class="meta">
+            <time class="date" datetime={isoDate(post.data.pubDate)} data-pagefind-meta="date">{formatDate(post.data.pubDate)}</time>
+            <a class="topic" href={topicUrl(post.data.topic)} data-pagefind-meta="topic">{topic.label}</a>
+          </div>
+          <h1 class="article-title">{post.data.title}</h1>
+        </header>
+        <hr class="article-rule" />
+      </div>
+    )}
+    <div class="container">
+      <div class="article-layout">
+        <aside class="article-aside"><Toc headings={headings} /></aside>
+        <div class="article-body">
+          {series.length > 1 && (
+            <div class="series">
+              <strong>{post.data.series}</strong>, part {series.findIndex((p) => p.id === post.id) + 1} of {series.length}
+              <ol>
+                {series.map((p) => (
+                  <li><a href={postUrl(p)} aria-current={p.id === post.id ? 'page' : undefined}>{p.data.title}</a></li>
+                ))}
+              </ol>
+            </div>
+          )}
+          <div class="prose">
+            <Content />
+          </div>
+        </div>
+      </div>
+      <footer class="article-foot">
+        <span>Published {formatDate(post.data.pubDate)}</span>
+        {post.data.updatedDate && <span>Updated {formatDate(post.data.updatedDate)}</span>}
+        {post.data.tags.length > 0 && <span>{post.data.tags.join(' · ')}</span>}
+      </footer>
+      {more.length > 0 && (
+        <section class="keep-reading">
+          <h2>Keep reading</h2>
+          <PostGrid posts={more} />
+        </section>
+      )}
+    </div>
+  </article>
+</Base>
