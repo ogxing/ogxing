@@ -88,8 +88,8 @@ body[data-menu-open], body[data-search-open] { overflow: hidden; }
 .social svg { width: 16px; height: 16px; }
 
 /* ---------- listing: heading 48→32px, 3-col grid ≥768 (gap 24 / 80), square covers ---------- */
-.index-head { padding: 88px 0 48px; }
-@media (max-width: 767px) { .index-head { padding-top: 80px; } }
+.index-head { padding: 56px 0 32px; }
+@media (max-width: 767px) { .index-head { padding-top: 40px; } }
 .index-title { font-size: clamp(32px, 26.4px + 1.5vw, 48px); font-weight: 500; letter-spacing: -0.03em; line-height: 1.16; margin: 0; }
 .post-grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 80px 24px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 @media (max-width: 767px) { .post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
