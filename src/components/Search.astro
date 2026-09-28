@@ -1,0 +1,84 @@
+---
+/** Site search overlay backed by Pagefind's static index (built at `astro build`). */
+---
+<button class="icon-btn search-btn" type="button" aria-label="Open search" aria-controls="search" aria-expanded="false">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</button>
+<div id="search" class="search" hidden>
+  <div class="container search-inner">
+    <form class="search-form" role="search" onsubmit="return false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input class="search-input" type="search" placeholder="Search" aria-label="Search" autocomplete="off" spellcheck="false" />
+      <button class="icon-btn search-close" type="button" aria-label="Close search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </form>
+    <p class="search-status" aria-live="polite"></p>
+    <ol class="search-results"></ol>
+  </div>
+</div>
+<script>
+  type Result = { url: string; meta: { title?: string; topic?: string; date?: string }; excerpt: string };
+  const root = document.getElementById('search')!;
+  const openBtn = document.querySelector<HTMLButtonElement>('.search-btn')!;
+  const closeBtn = root.querySelector<HTMLButtonElement>('.search-close')!;
+  const input = root.querySelector<HTMLInputElement>('.search-input')!;
+  const status = root.querySelector<HTMLElement>('.search-status')!;
+  const list = root.querySelector<HTMLOListElement>('.search-results')!;
+  let pagefind: any = null;
+  let seq = 0;
+
+  async function engine() {
+    if (pagefind) return pagefind;
+    try {
+      const url = '/pagefind/pagefind.js';
+      pagefind = await import(/* @vite-ignore */ url);
+      await pagefind.init();
+    } catch {
+      pagefind = null;
+    }
+    return pagefind;
+  }
+
+  function open() {
+    root.hidden = false;
+    document.body.toggleAttribute('data-search-open', true);
+    openBtn.setAttribute('aria-expanded', 'true');
+    input.focus();
+    engine();
+  }
+  function close() {
+    root.hidden = true;
+    document.body.toggleAttribute('data-search-open', false);
+    openBtn.setAttribute('aria-expanded', 'false');
+  }
+
+  async function run() {
+    const q = input.value.trim();
+    const my = ++seq;
+    if (!q) { list.innerHTML = ''; status.textContent = ''; return; }
+    const pf = await engine();
+    if (!pf) { status.textContent = 'Search is available on the published site.'; return; }
+    const res = await pf.search(q);
+    if (my !== seq) return;
+    const items: Result[] = await Promise.all(res.results.slice(0, 10).map((r: any) => r.data()));
+    if (my !== seq) return;
+    status.textContent = items.length ? `${res.results.length} result${res.results.length === 1 ? '' : 's'}` : 'No results';
+    list.innerHTML = items.map((r) => `
+      <li>
+        <a href="${r.url.replace(/\.html$/, '')}">
+          <span class="search-title">${r.meta.title ?? r.url}</span>
+          <span class="search-excerpt">${r.excerpt}</span>
+          <span class="meta">${r.meta.topic ? `<span class="topic">${r.meta.topic}</span>` : ''}${r.meta.date ? `<span class="date">${r.meta.date}</span>` : ''}</span>
+        </a>
+      </li>`).join('');
+  }
+
+  openBtn.addEventListener('click', open);
+  closeBtn.addEventListener('click', close);
+  input.addEventListener('input', run);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !root.hidden) close();
+    if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || (e.key === '/' && !/input|textarea/i.test((e.target as HTMLElement).tagName))) { e.preventDefault(); root.hidden ? open() : close(); }
+  });
+</script>

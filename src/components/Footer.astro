@@ -1,0 +1,18 @@
+---
+import { LINKS } from '../consts';
+import Icon from './Icon.astro';
+const social = LINKS;
+---
+<footer class="site-footer">
+  <div class="container row">
+    <ul class="social" aria-label="Elsewhere">
+      {social.map((l) => (
+        <li>
+          <a href={l.href} rel={l.href.startsWith('http') ? 'me noopener' : 'me'} target={l.href.startsWith('http') ? '_blank' : undefined} aria-label={l.label} title={l.label}>
+            <Icon name={l.icon} />
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</footer>

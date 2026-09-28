@@ -1,0 +1,13 @@
+---
+import { Image } from 'astro:assets';
+import { coverStyle } from '../lib/cover';
+import type { Post } from '../lib/posts';
+interface Props { post: Post; sizes?: string }
+const { post, sizes = '(max-width: 599px) 100vw, (max-width: 767px) 50vw, 33vw' } = Astro.props;
+const cover = post.data.cover;
+---
+{cover ? (
+  <div class="cover"><Image src={cover} alt="" widths={[480, 800, 1200]} sizes={sizes} /></div>
+) : (
+  <div class="cover generated" style={`background: ${coverStyle(post.id)}`} aria-hidden="true"></div>
+)}

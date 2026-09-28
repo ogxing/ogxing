@@ -1,0 +1,18 @@
+---
+import Cover from './Cover.astro';
+import { TOPICS } from '../consts';
+import { formatDate, isoDate } from '../lib/format';
+import { postUrl, type Post } from '../lib/posts';
+interface Props { post: Post }
+const { post } = Astro.props;
+---
+<li class="post-card">
+  <a href={postUrl(post)}>
+    <Cover post={post} />
+    <h2>{post.data.title}</h2>
+    <div class="meta">
+      <span class="topic">{TOPICS[post.data.topic].label}</span>
+      <time class="date" datetime={isoDate(post.data.pubDate)}>{formatDate(post.data.pubDate)}</time>
+    </div>
+  </a>
+</li>
