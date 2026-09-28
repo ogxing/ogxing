@@ -4,6 +4,8 @@
 <button class="icon-btn search-btn" type="button" aria-label="Open search" aria-controls="search" aria-expanded="false">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
 </button>
+<!-- Loaded outside the bundler: Vite mangles a dynamic import of a path that only exists after the build. -->
+<script is:inline>window.__loadPagefind = () => import('/pagefind/pagefind.js');</script>
 <div id="search" class="search" hidden>
   <div class="container search-inner">
     <form class="search-form" role="search" onsubmit="return false">
@@ -31,8 +33,7 @@
   async function engine() {
     if (pagefind) return pagefind;
     try {
-      const url = '/pagefind/pagefind.js';
-      pagefind = await import(/* @vite-ignore */ url);
+      pagefind = await (window as any).__loadPagefind();
       await pagefind.init();
     } catch {
       pagefind = null;
