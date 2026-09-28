@@ -4,6 +4,8 @@ Source for [ogxing.com](https://ogxing.com)
 
 Built with [Astro](https://astro.build), deployed to GitHub Pages by `.github/workflows/deploy.yml`.
 
+Do not edit or create README.md as it has special meaning on github, it will be displayed as part of your github profile.
+
 ## Develop
 
 ```bash
